@@ -60,6 +60,13 @@ void	 maybe_add_key_to_agent(char *, Key *, char *, char *);
 /*
  * Macros to raise/lower permissions.
  */
+#ifdef __Fuchsia__
+#define PRIV_START do {					\
+} while (0)
+
+#define PRIV_END do {					\
+} while (0)
+#else
 #define PRIV_START do {					\
 	int save_errno = errno;				\
 	if (seteuid(original_effective_uid) != 0)	\
@@ -75,3 +82,4 @@ void	 maybe_add_key_to_agent(char *, Key *, char *, char *);
 		    strerror(errno));			\
 	errno = save_errno;				\
 } while (0)
+#endif

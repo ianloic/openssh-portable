@@ -122,7 +122,7 @@ parse_prime(int linenum, char *line, struct dhgroup *dhg)
 		error("moduli:%d: could not parse prime value", linenum);
 		goto fail;
 	}
-	if (BN_num_bits(dhg->p) != dhg->size) {
+	if (BN_num_bits(dhg->p) != (unsigned int)dhg->size) {
 		error("moduli:%d: prime has wrong size: actual %d listed %d",
 		    linenum, BN_num_bits(dhg->p), dhg->size - 1);
 		goto fail;
@@ -271,7 +271,7 @@ dh_gen_key(DH *dh, int need)
 	 * Pollard Rho, Big step/Little Step attacks are O(sqrt(n)),
 	 * so double requested need here.
 	 */
-	dh->length = MINIMUM(need * 2, pbits - 1);
+	dh->priv_length = MINIMUM(need * 2, pbits - 1);
 	if (DH_generate_key(dh) == 0 ||
 	    !dh_pub_is_valid(dh, dh->pub_key)) {
 		BN_clear_free(dh->priv_key);

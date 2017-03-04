@@ -152,7 +152,7 @@ sshbuf_put_bignum2(struct sshbuf *buf, const BIGNUM *v)
 	if (len < 0 || len > SSHBUF_MAX_BIGNUM)
 		return SSH_ERR_INVALID_ARGUMENT;
 	*d = '\0';
-	if (BN_bn2bin(v, d + 1) != len)
+	if (BN_bn2bin(v, d + 1) != (size_t)len)
 		return SSH_ERR_INTERNAL_ERROR; /* Shouldn't happen */
 	/* If MSB is set, prepend a \0 */
 	if (len > 0 && (d[1] & 0x80) != 0)
@@ -174,7 +174,7 @@ sshbuf_put_bignum1(struct sshbuf *buf, const BIGNUM *v)
 
 	if (len_bits < 0 || len_bytes > SSHBUF_MAX_BIGNUM)
 		return SSH_ERR_INVALID_ARGUMENT;
-	if (BN_bn2bin(v, d) != (int)len_bytes)
+	if (BN_bn2bin(v, d) != len_bytes)
 		return SSH_ERR_INTERNAL_ERROR; /* Shouldn't happen */
 	if ((r = sshbuf_reserve(buf, len_bytes + 2, &dp)) < 0) {
 		explicit_bzero(d, sizeof(d));

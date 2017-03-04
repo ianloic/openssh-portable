@@ -3544,7 +3544,7 @@ sshkey_private_pem_to_blob(struct sshkey *key, struct sshbuf *blob,
 		r = SSH_ERR_LIBCRYPTO_ERROR;
 		goto out;
 	}
-	if ((blen = BIO_get_mem_data(bio, &bptr)) <= 0) {
+	if ((blen = BIO_get_mem_data(bio, (char**)&bptr)) <= 0) {
 		r = SSH_ERR_INTERNAL_ERROR;
 		goto out;
 	}
@@ -3799,7 +3799,9 @@ sshkey_parse_private_pem_fileblob(struct sshbuf *blob, int type,
 		case ERR_LIB_PEM:
 			switch (pem_reason) {
 			case PEM_R_BAD_PASSWORD_READ:
+#ifdef PEM_R_PROBLEMS_GETTING_PASSWORD
 			case PEM_R_PROBLEMS_GETTING_PASSWORD:
+#endif
 			case PEM_R_BAD_DECRYPT:
 				r = SSH_ERR_KEY_WRONG_PASSPHRASE;
 				goto out;
@@ -3809,10 +3811,14 @@ sshkey_parse_private_pem_fileblob(struct sshbuf *blob, int type,
 			}
 		case ERR_LIB_EVP:
 			switch (pem_reason) {
+#ifdef EVP_R_BAD_DECRYPT
 			case EVP_R_BAD_DECRYPT:
 				r = SSH_ERR_KEY_WRONG_PASSPHRASE;
 				goto out;
+#endif
+#ifdef EVP_R_BN_DECODE_ERROR
 			case EVP_R_BN_DECODE_ERROR:
+#endif
 			case EVP_R_DECODE_ERROR:
 #ifdef EVP_R_PRIVATE_KEY_DECODE_ERROR
 			case EVP_R_PRIVATE_KEY_DECODE_ERROR:

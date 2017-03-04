@@ -1,0 +1,459 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+group("openssh-portable") {
+  deps = [
+    ":config-files",
+    ":scp",
+    ":sftp-server",
+    ":ssh",
+    ":ssh-keygen",
+    ":sshd",
+  ]
+}
+
+config("fuchsia") {
+  include_dirs = [
+    ".",
+    "fuchsia",
+  ]
+  defines = [
+    "u_int64_t=uint64_t",
+    "SSHDIR=\"/system/data/ssh\"",
+  ]
+  cflags = [
+    "-include",
+    rebase_path("fuchsia/fuchsia-compat.h"),
+  ]
+
+  configs = [
+    "//third_party/boringssl:boringssl_config",
+    "//third_party/zlib:zlib_config",
+  ]
+}
+
+copy("config-files") {
+  sources = [
+    "fuchsia/sshd_config",
+  ]
+  outputs = [
+    "$root_out_dir/{{source_file_part}}",
+  ]
+}
+
+source_set("fuchsia-compat") {
+  sources = [
+    "fuchsia/fuchsia-compat.c",
+    "fuchsia/fuchsia-compat.h",
+  ]
+  configs += [ ":fuchsia" ]
+}
+
+# This needs to be a static library because some of its symbols are replaced
+# when it is linked into executables.
+static_library("libopenssh") {
+  sources = [
+    "bitmap.c",
+    "bitmap.h",
+    "krl.c",
+    "krl.h",
+    "ssh_api.c",
+    "ssh_api.h",
+    "sshbuf-getput-basic.c",
+    "sshbuf-getput-crypto.c",
+    "sshbuf-misc.c",
+    "sshbuf.c",
+    "sshbuf.h",
+    "ssherr.c",
+    "ssherr.h",
+    "sshkey.c",
+    "sshkey.h",
+  ]
+  configs += [ ":fuchsia" ]
+
+  deps = [
+    "//third_party/boringssl",
+    "//third_party/zlib",
+  ]
+}
+
+config("umac128_config") {
+  defines = [
+    "UMAC_OUTPUT_LEN=16",
+    "umac_new=umac128_new",
+    "umac_update=umac128_update",
+    "umac_final=umac128_final",
+    "umac_delete=umac128_delete",
+    "umac_ctx=umac128_ctx",
+  ]
+}
+
+source_set("umac128") {
+  sources = [
+    "umac.c",
+  ]
+  configs += [
+    ":umac128_config",
+    ":fuchsia",
+  ]
+}
+
+# This needs to be a static library because some of its symbols are replaced
+# when it is linked into executables.
+static_library("libssh") {
+  sources = [
+    "addrmatch.c",
+    "atomicio.c",
+    "atomicio.h",
+    "authfd.c",
+    "authfd.h",
+    "authfile.c",
+    "authfile.h",
+    "blocks.c",
+    "bufaux.c",
+    "bufbn.c",
+    "bufec.c",
+    "buffer.c",
+    "buffer.h",
+    "canohost.c",
+    "canohost.h",
+    "chacha.c",
+    "chacha.h",
+    "channels.c",
+    "channels.h",
+    "cipher-3des1.c",
+    "cipher-aes.c",
+    "cipher-aesctr.c",
+    "cipher-aesctr.h",
+    "cipher-bf1.c",
+    "cipher-chachapoly.c",
+    "cipher-chachapoly.h",
+    "cipher-ctr.c",
+    "cipher.c",
+    "cipher.h",
+    "cleanup.c",
+    "compat.c",
+    "compat.h",
+    "crc32.c",
+    "crc32.h",
+    "deattack.c",
+    "deattack.h",
+    "dh.c",
+    "dh.h",
+    "digest-libc.c",
+    "digest-openssl.c",
+    "dispatch.c",
+    "dispatch.h",
+    "dns.c",
+    "dns.h",
+    "ed25519.c",
+    "entropy.c",
+    "entropy.h",
+    "fatal.c",
+    "fe25519.c",
+    "fe25519.h",
+    "ge25519.c",
+    "ge25519.h",
+    "gss-genr.c",
+    "hash.c",
+    "hmac.c",
+    "hmac.h",
+    "hostfile.c",
+    "hostfile.h",
+    "kex.c",
+    "kex.h",
+    "kexc25519.c",
+    "kexc25519c.c",
+    "kexc25519s.c",
+    "kexdh.c",
+    "kexdhc.c",
+    "kexdhs.c",
+    "kexecdh.c",
+    "kexecdhc.c",
+    "kexecdhs.c",
+    "kexgex.c",
+    "kexgexc.c",
+    "kexgexs.c",
+    "key.c",
+    "key.h",
+    "log.c",
+    "log.h",
+    "mac.c",
+    "mac.h",
+    "match.c",
+    "match.h",
+    "md-sha256.c",
+    "misc.c",
+    "misc.h",
+    "moduli.c",
+    "monitor_fdpass.c",
+    "monitor_fdpass.h",
+    "msg.c",
+    "msg.h",
+    "nchan.c",
+    "opacket.c",
+    "opacket.h",
+    "packet.c",
+    "packet.h",
+    "platform-pledge.c",
+    "platform-tracing.c",
+    "poly1305.c",
+    "poly1305.h",
+    "progressmeter.c",
+    "progressmeter.h",
+    "readpass.c",
+    "rijndael.c",
+    "rijndael.h",
+    "rsa.c",
+    "rsa.h",
+    "sc25519.c",
+    "sc25519.h",
+    "smult_curve25519_ref.c",
+    "ssh-dss.c",
+    "ssh-ecdsa.c",
+    "ssh-ed25519.c",
+    "ssh-pkcs11.c",
+    "ssh-pkcs11.h",
+    "ssh-rsa.c",
+    "ttymodes.c",
+    "ttymodes.h",
+    "uidswap.c",
+    "uidswap.h",
+    "umac.c",
+    "umac.h",
+    "utf8.c",
+    "utf8.h",
+    "uuencode.c",
+    "uuencode.h",
+    "verify.c",
+    "xmalloc.c",
+    "xmalloc.h",
+  ]
+
+  deps = [
+    ":fuchsia-compat",
+    ":libopenssh",
+    ":openbsd-compat",
+    ":umac128",
+    "//third_party/boringssl",
+  ]
+  configs += [ ":fuchsia" ]
+}
+
+config("openbsd-compat-config") {
+  include_dirs = [ "openbsd-compat" ]
+}
+
+source_set("openbsd-compat") {
+  sources = [
+    "openbsd-compat/arc4random.c",
+    "openbsd-compat/base64.c",
+    "openbsd-compat/base64.h",
+    "openbsd-compat/basename.c",
+    "openbsd-compat/bcrypt_pbkdf.c",
+    "openbsd-compat/bindresvport.c",
+    "openbsd-compat/blowfish.c",
+    "openbsd-compat/bsd-asprintf.c",
+    "openbsd-compat/bsd-closefrom.c",
+    "openbsd-compat/bsd-cray.c",
+    "openbsd-compat/bsd-cray.h",
+    "openbsd-compat/bsd-cygwin_util.c",
+    "openbsd-compat/bsd-cygwin_util.h",
+    "openbsd-compat/bsd-err.c",
+    "openbsd-compat/bsd-getpeereid.c",
+    "openbsd-compat/bsd-misc.c",
+    "openbsd-compat/bsd-misc.h",
+    "openbsd-compat/bsd-nextstep.c",
+    "openbsd-compat/bsd-nextstep.h",
+    "openbsd-compat/bsd-openpty.c",
+    "openbsd-compat/bsd-poll.c",
+    "openbsd-compat/bsd-poll.h",
+    "openbsd-compat/bsd-setres_id.c",
+    "openbsd-compat/bsd-setres_id.h",
+    "openbsd-compat/bsd-snprintf.c",
+    "openbsd-compat/bsd-statvfs.c",
+    "openbsd-compat/bsd-statvfs.h",
+    "openbsd-compat/bsd-waitpid.c",
+    "openbsd-compat/bsd-waitpid.h",
+    "openbsd-compat/daemon.c",
+    "openbsd-compat/dirname.c",
+    "openbsd-compat/explicit_bzero.c",
+    "openbsd-compat/fake-rfc2553.c",
+    "openbsd-compat/fake-rfc2553.h",
+    "openbsd-compat/fmt_scaled.c",
+    "openbsd-compat/getcwd.c",
+    "openbsd-compat/getgrouplist.c",
+    "openbsd-compat/getopt_long.c",
+    "openbsd-compat/getrrsetbyname-ldns.c",
+    "openbsd-compat/getrrsetbyname.c",
+    "openbsd-compat/getrrsetbyname.h",
+    "openbsd-compat/glob.c",
+    "openbsd-compat/glob.h",
+    "openbsd-compat/inet_aton.c",
+    "openbsd-compat/inet_ntoa.c",
+    "openbsd-compat/inet_ntop.c",
+    "openbsd-compat/kludge-fd_set.c",
+    "openbsd-compat/md5.c",
+    "openbsd-compat/md5.h",
+    "openbsd-compat/mktemp.c",
+    "openbsd-compat/openssl-compat.c",
+    "openbsd-compat/openssl-compat.h",
+    "openbsd-compat/pwcache.c",
+    "openbsd-compat/readpassphrase.c",
+    "openbsd-compat/readpassphrase.h",
+    "openbsd-compat/reallocarray.c",
+    "openbsd-compat/realpath.c",
+    "openbsd-compat/rmd160.c",
+    "openbsd-compat/rmd160.h",
+    "openbsd-compat/rresvport.c",
+    "openbsd-compat/setenv.c",
+    "openbsd-compat/setproctitle.c",
+    "openbsd-compat/sha1.c",
+    "openbsd-compat/sha1.h",
+    "openbsd-compat/sha2.c",
+    "openbsd-compat/sha2.h",
+    "openbsd-compat/sigact.c",
+    "openbsd-compat/sigact.h",
+    "openbsd-compat/strcasestr.c",
+    "openbsd-compat/strlcat.c",
+    "openbsd-compat/strlcpy.c",
+    "openbsd-compat/strmode.c",
+    "openbsd-compat/strnlen.c",
+    "openbsd-compat/strptime.c",
+    "openbsd-compat/strsep.c",
+    "openbsd-compat/strtoll.c",
+    "openbsd-compat/strtonum.c",
+    "openbsd-compat/strtoul.c",
+    "openbsd-compat/strtoull.c",
+    "openbsd-compat/timingsafe_bcmp.c",
+    "openbsd-compat/vis.c",
+    "openbsd-compat/vis.h",
+  ]
+  configs += [
+    ":fuchsia",
+    ":openbsd-compat-config",
+  ]
+}
+
+executable("ssh") {
+  sources = [
+    "clientloop.c",
+    "mux.c",
+    "readconf.c",
+    "ssh.c",
+    "sshconnect.c",
+    "sshconnect1.c",
+    "sshconnect2.c",
+    "sshtty.c",
+  ]
+  deps = [
+    ":libssh",
+  ]
+  configs += [ ":fuchsia" ]
+}
+
+executable("sshd") {
+  sources = [
+    "audit-bsm.c",
+    "audit-linux.c",
+    "audit.c",
+    "audit.h",
+    "auth-bsdauth.c",
+    "auth-krb5.c",
+    "auth-options.c",
+    "auth-options.h",
+    "auth-pam.c",
+    "auth-pam.h",
+    "auth-passwd.c",
+    "auth-rhosts.c",
+    "auth-shadow.c",
+    "auth-sia.c",
+    "auth-sia.h",
+    "auth-skey.c",
+    "auth.c",
+    "auth.h",
+    "auth2-chall.c",
+    "auth2-gss.c",
+    "auth2-hostbased.c",
+    "auth2-kbdint.c",
+    "auth2-none.c",
+    "auth2-passwd.c",
+    "auth2-pubkey.c",
+    "auth2.c",
+    "groupaccess.c",
+    "groupaccess.h",
+    "gss-serv-krb5.c",
+    "gss-serv.c",
+    "loginrec.c",
+    "loginrec.h",
+    "md5crypt.c",
+    "md5crypt.h",
+    "monitor.c",
+    "monitor.h",
+    "monitor_wrap.c",
+    "monitor_wrap.h",
+    "platform.c",
+    "platform.h",
+    "sandbox-capsicum.c",
+    "sandbox-darwin.c",
+    "sandbox-null.c",
+    "sandbox-pledge.c",
+    "sandbox-rlimit.c",
+    "sandbox-seccomp-filter.c",
+    "sandbox-solaris.c",
+    "sandbox-systrace.c",
+    "servconf.c",
+    "servconf.h",
+    "serverloop.c",
+    "serverloop.h",
+    "session.c",
+    "session.h",
+    "sftp-common.c",
+    "sftp-common.h",
+    "sftp-server.c",
+    "sshd.c",
+    "sshlogin.c",
+    "sshlogin.h",
+    "sshpty.c",
+    "sshpty.h",
+  ]
+  configs += [ ":fuchsia" ]
+  deps = [
+    ":libssh",
+  ]
+}
+
+executable("ssh-keygen") {
+  configs += [ ":fuchsia" ]
+  sources = [
+    "ssh-keygen.c",
+  ]
+  deps = [
+    ":libssh",
+  ]
+}
+
+executable("sftp-server") {
+  sources = [
+    "sftp-common.c",
+    "sftp-server-main.c",
+    "sftp-server.c",
+  ]
+  configs += [ ":fuchsia" ]
+  deps = [
+    ":libssh",
+  ]
+}
+
+executable("scp") {
+  sources = [
+    "bufaux.c",
+    "progressmeter.c",
+    "scp.c",
+  ]
+  configs += [ ":fuchsia" ]
+  deps = [
+    ":libssh",
+  ]
+}
