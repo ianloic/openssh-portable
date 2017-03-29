@@ -174,6 +174,7 @@ allowed_user(struct passwd * pw)
 			free(shell);
 			return 0;
 		}
+#ifndef __Fuchsia__
 		if (S_ISREG(st.st_mode) == 0 ||
 		    (st.st_mode & (S_IXOTH|S_IXUSR|S_IXGRP)) == 0) {
 			logit("User %.100s not allowed because shell %.100s "
@@ -181,6 +182,7 @@ allowed_user(struct passwd * pw)
 			free(shell);
 			return 0;
 		}
+#endif  // __Fuchsia__
 		free(shell);
 	}
 

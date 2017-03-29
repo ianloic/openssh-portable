@@ -961,7 +961,7 @@
 /* #undef HAVE_SETGROUPENT */
 
 /* Define to 1 if you have the `setgroups' function. */
-#define HAVE_SETGROUPS 1
+/*#define HAVE_SETGROUPS 1*/
 
 /* Define to 1 if you have the `setlinebuf' function. */
 #define HAVE_SETLINEBUF 1
@@ -1045,7 +1045,7 @@
 #define HAVE_SNPRINTF 1
 
 /* Define to 1 if you have the `socketpair' function. */
-#define HAVE_SOCKETPAIR 1
+/*#define HAVE_SOCKETPAIR 1*/
 
 /* Have PEERCRED socket option */
 #define HAVE_SO_PEERCRED 1
@@ -1162,7 +1162,7 @@
 /* #undef HAVE_SWAP32 */
 
 /* Define to 1 if you have the `sysconf' function. */
-#define HAVE_SYSCONF 1
+/*#define HAVE_SYSCONF 1*/
 
 /* Define if you have syslen in utmpx.h */
 /* #undef HAVE_SYSLEN_IN_UTMPX */
@@ -1678,7 +1678,7 @@
 /* #undef USE_PAM */
 
 /* Use PIPES instead of a socketpair() */
-/* #undef USE_PIPES */
+#define USE_PIPES 1
 
 /* Define if you have Solaris privileges */
 /* #undef USE_SOLARIS_PRIVS */

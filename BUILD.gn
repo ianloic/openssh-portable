@@ -238,6 +238,7 @@ static_library("libssh") {
     ":umac128",
     "//third_party/boringssl",
   ]
+  libs = [ "launchpad" ]
   configs += [ ":fuchsia" ]
 }
 

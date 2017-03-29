@@ -343,6 +343,27 @@ do_exec_no_pty(Session *s, const char *command)
 
 	session_proctitle(s);
 
+#ifdef __Fuchsia__
+        mx_handle_t process_handle = fuchsia_launch_child(command, pin[0], pout[1], perr[1]);
+        if (process_handle == 0) {
+#ifdef USE_PIPES
+		close(pin[0]);
+		close(pin[1]);
+		close(pout[0]);
+		close(pout[1]);
+		close(perr[0]);
+		close(perr[1]);
+#else
+		close(inout[0]);
+		close(inout[1]);
+		close(err[0]);
+		close(err[1]);
+#endif
+		return -1;
+        }
+        // Force an mx_handle_t into a pid_t.
+        pid = (pid_t)process_handle;
+#else
 	/* Fork the child. */
 	switch ((pid = fork())) {
 	case -1:
@@ -434,6 +455,7 @@ do_exec_no_pty(Session *s, const char *command)
 #endif
 
 	s->pid = pid;
+#endif  // __Fuchsia__
 	/* Set interactive/non-interactive mode. */
 	packet_set_interactive(s->display != NULL,
 	    options.ip_qos_interactive, options.ip_qos_bulk);

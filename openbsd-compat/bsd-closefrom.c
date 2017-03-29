@@ -47,6 +47,10 @@
 # endif
 #endif
 
+#ifdef __Fuchsia__
+#include <mxio/limits.h>
+#endif
+
 #ifndef OPEN_MAX
 # define OPEN_MAX	256
 #endif
@@ -95,6 +99,8 @@ closefrom(int lowfd)
 	 */
 #ifdef HAVE_SYSCONF
 	maxfd = sysconf(_SC_OPEN_MAX);
+#elif __Fuchsia__
+        maxfd = MAX_MXIO_FD;
 #else
 	maxfd = getdtablesize();
 #endif /* HAVE_SYSCONF */

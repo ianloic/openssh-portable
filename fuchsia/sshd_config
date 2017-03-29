@@ -93,7 +93,7 @@ PasswordAuthentication no
 #PrintLastLog yes
 #TCPKeepAlive yes
 #UseLogin no
-#UsePrivilegeSeparation sandbox
+UsePrivilegeSeparation no
 #PermitUserEnvironment no
 #Compression delayed
 #ClientAliveInterval 0
@@ -109,7 +109,7 @@ PidFile /tmp/sshd.pid
 #Banner none
 
 # override default of no subsystems
-Subsystem	sftp	/usr/libexec/sftp-server
+Subsystem	sftp	/system/bin/sftp-server
 
 # Example of overriding settings on a per-user basis
 #Match User anoncvs
