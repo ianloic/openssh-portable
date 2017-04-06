@@ -25,7 +25,10 @@ def main(output_dir):
     dot_ssh = os.path.join(os.environ['HOME'], '.ssh')
     files = [os.path.join(dot_ssh, f) for f in os.listdir(dot_ssh) if f.endswith('.pub') and not f.endswith('-cert.pub')]
     if len(files) == 0:
-      raise Exception('No SSH public keys found in ~/.ssh')
+      sys.stderr.write('WARNING: No SSH public keys found in ~/.ssh\n')
+      # create an empty authorized_keys file
+      open(authorized_keys, 'a').close()
+      return
     if len(files) > 1:
       files.sort(key=lambda f: os.path.getmtime(f))
     shutil.copyfile(files[-1], os.path.join(authorized_keys))
