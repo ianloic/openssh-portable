@@ -344,8 +344,8 @@ do_exec_no_pty(Session *s, const char *command)
 	session_proctitle(s);
 
 #ifdef __Fuchsia__
-        mx_handle_t process_handle = fuchsia_launch_child(command, pin[0], pout[1], perr[1]);
-        if (process_handle == 0) {
+        pid = fuchsia_launch_child(command, pin[0], pout[1], perr[1]);
+        if (pid <= 0) {
 #ifdef USE_PIPES
 		close(pin[0]);
 		close(pin[1]);
@@ -361,8 +361,6 @@ do_exec_no_pty(Session *s, const char *command)
 #endif
 		return -1;
         }
-        // Force an mx_handle_t into a pid_t.
-        pid = (pid_t)process_handle;
 #else
 	/* Fork the child. */
 	switch ((pid = fork())) {
@@ -454,8 +452,10 @@ do_exec_no_pty(Session *s, const char *command)
 	cygwin_set_impersonation_token(INVALID_HANDLE_VALUE);
 #endif
 
-	s->pid = pid;
 #endif  // __Fuchsia__
+
+	s->pid = pid;
+
 	/* Set interactive/non-interactive mode. */
 	packet_set_interactive(s->display != NULL,
 	    options.ip_qos_interactive, options.ip_qos_bulk);

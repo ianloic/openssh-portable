@@ -16,9 +16,10 @@ Then copy your public SSH key to your Fuchsia device from your host:
 % netcp ~/.ssh/id_rsa.pub :/.ssh/authorized_keys
 ```
 
-Run `sshd` with `-d` for debug mode and `-r` to disable reexecing:
+Under `listen` run `sshd -ire` where `i` is for inetd mode, `r` to disable
+reexecing and `e` to print logs to stderr:
 ```
-$ sshd -dr
+$ listen 22 /system/bin/sshd -ire
 ```
 ### scp
 

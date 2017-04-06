@@ -6,7 +6,7 @@
 #include <magenta/types.h>
 
 int chroot(const char *path);
-mx_handle_t fuchsia_launch_child(const char *command, int in, int out, int err);
+int fuchsia_launch_child(const char *command, int in, int out, int err);
 
 #define CUSTOM_SYS_AUTH_PASSWD
 
