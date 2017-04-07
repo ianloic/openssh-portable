@@ -23,6 +23,11 @@ def main(output_dir):
     # pick the most recent ~/.ssh/*.pub that isn't ~/.ssh/*-cert.pub
     # this is what ssh-copy-id does
     dot_ssh = os.path.join(os.environ['HOME'], '.ssh')
+    if not os.path.isdir(dot_ssh):
+        sys.stderr.write('NOTE: ~/.ssh not found\n')
+        open(authorized_keys, 'a').close()
+        return
+
     files = [os.path.join(dot_ssh, f) for f in os.listdir(dot_ssh) if f.endswith('.pub') and not f.endswith('-cert.pub')]
     if len(files) == 0:
       sys.stderr.write('WARNING: No SSH public keys found in ~/.ssh\n')
