@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -euf
+
+if [ $# -ne 2 ]; then
+  echo "$0 type path"
+  exit 1
+fi
+
+if [ ! -e "$2" ]; then
+  # only generate if the file doesn't exist yet
+  ssh-keygen -q -t "$1" -f "$2" -N "" -C ""
+fi

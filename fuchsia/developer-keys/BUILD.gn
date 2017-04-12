@@ -2,19 +2,63 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-action("developer-keys") {
-  script = "developer-keys.py"
-  dir = "${root_build_dir}/ssh-keys"
-  args = [ rebase_path(dir) ]
+group("developer-keys") {
+  deps = [
+    ":authorized_keys",
+    ":host_key",
+    ":id_key",
+    ":ssh_config",
+  ]
+}
+
+keys_dir = "${root_build_dir}/ssh-keys"
+
+action("host_key") {
+  key_file = "${keys_dir}/ssh_host_ed25519_key"
+  script = "ssh-keygen-wrapper"
+  args = [
+    "ed25519",
+    rebase_path(key_file),
+  ]
   outputs = [
-    "${dir}/authorized_keys",
-    "${dir}/ssh_host_dsa_key",
-    "${dir}/ssh_host_dsa_key.pub",
-    "${dir}/ssh_host_ecdsa_key",
-    "${dir}/ssh_host_ecdsa_key.pub",
-    "${dir}/ssh_host_ed25519_key",
-    "${dir}/ssh_host_ed25519_key.pub",
-    "${dir}/ssh_host_rsa_key",
-    "${dir}/ssh_host_rsa_key.pub",
+    key_file,
+    key_file + ".pub"
+  ]
+}
+
+action("id_key") {
+  key_file = "${keys_dir}/id_ed25519"
+  script = "ssh-keygen-wrapper"
+  args = [
+    "ed25519",
+    rebase_path(key_file),
+  ]
+  outputs = [
+    key_file,
+    key_file + ".pub"
+  ]
+}
+
+copy("authorized_keys") {
+  sources = [
+    "${keys_dir}/id_ed25519.pub",
+  ]
+  outputs = [
+    "${keys_dir}/authorized_keys",
+  ]
+  deps = [
+    ":id_key",
+  ]
+}
+
+action("ssh_config") {
+  config_file = "${keys_dir}/ssh_config"
+  script = "generate_ssh_config.sh"
+  args = [
+    rebase_path("${keys_dir}/id_ed25519"),
+    rebase_path(config_file),
+  ]
+  outputs = [
+    config_file,
   ]
 }
