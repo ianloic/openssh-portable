@@ -53,6 +53,10 @@
 # endif
 #endif
 
+#ifdef __Fuchsia__
+#include <magenta/device/pty.h>
+#endif  // __Fuchsia__
+
 /*
  * Allocates and opens a pty.  Returns 0 if no pty could be allocated, or
  * nonzero if a pty was successfully allocated.  On success, open file
@@ -63,6 +67,21 @@
 int
 pty_allocate(int *ptyfd, int *ttyfd, char *namebuf, size_t namebuflen)
 {
+#ifdef __Fuchsia__
+        *ptyfd = open("/dev/misc/ptmx", O_RDWR | O_NONBLOCK);
+        if (*ptyfd < 0) {
+                error("open /dev/misc/ptmx: %s", strerror(errno));
+                return 0;
+        }
+        *ttyfd = openat(*ptyfd, "0", O_RDWR | O_NONBLOCK);
+        if (*ttyfd < 0) {
+                error("openat /dev/misc/ptmx 0: %s", strerror(errno));
+                return 0;
+        }
+        // ssh thinks it wants to be able to manipulate a PTY by filename but
+        // that isn't possible on Fuchsia.
+        strlcpy(namebuf, "/dev/not-a-file", namebuflen);
+#else
 	/* openpty(3) exists in OSF/1 and some other os'es */
 	char *name;
 	int i;
@@ -77,6 +96,7 @@ pty_allocate(int *ptyfd, int *ttyfd, char *namebuf, size_t namebuflen)
 		fatal("openpty returns device for which ttyname fails.");
 
 	strlcpy(namebuf, name, namebuflen);	/* possible truncation */
+#endif  // __Fuchsia__
 	return 1;
 }
 
@@ -176,6 +196,13 @@ void
 pty_change_window_size(int ptyfd, u_int row, u_int col,
 	u_int xpixel, u_int ypixel)
 {
+#ifdef __Fuchsia__
+        pty_window_size_t w;
+
+        w.width = col;
+        w.height = row;
+        ioctl_pty_set_window_size(ptyfd, &w);
+#else
 	struct winsize w;
 
 	/* may truncate u_int -> u_short */
@@ -184,11 +211,17 @@ pty_change_window_size(int ptyfd, u_int row, u_int col,
 	w.ws_xpixel = xpixel;
 	w.ws_ypixel = ypixel;
 	(void) ioctl(ptyfd, TIOCSWINSZ, &w);
+#endif  // __Fuchsia__
 }
 
 void
 pty_setowner(struct passwd *pw, const char *tty)
 {
+#ifdef __Fuchsia__
+        // This is meaningless on Fuchsia.
+        return;
+#endif
+
 	struct group *grp;
 	gid_t gid;
 	mode_t mode;

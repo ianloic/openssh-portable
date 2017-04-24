@@ -529,6 +529,10 @@ do_exec_pty(Session *s, const char *command)
 		return -1;
 	}
 
+#ifdef __Fuchsia__
+        pid = fuchsia_launch_child(command, ttyfd, ttyfd, ttyfd);
+
+#else
 	/* Fork the child. */
 	switch ((pid = fork())) {
 	case -1:
@@ -587,6 +591,8 @@ do_exec_pty(Session *s, const char *command)
 #ifdef HAVE_CYGWIN
 	cygwin_set_impersonation_token(INVALID_HANDLE_VALUE);
 #endif
+
+#endif  // __Fuchsia__
 
 	s->pid = pid;
 

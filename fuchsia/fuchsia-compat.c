@@ -118,8 +118,16 @@ pid_t fuchsia_launch_child(const char *command, int in, int out, int err) {
   launchpad_set_args(lp, argc, argv);
   launchpad_clone(lp, LP_CLONE_MXIO_ROOT|LP_CLONE_MXIO_CWD);
   // TODO: set up environment
-  launchpad_transfer_fd(lp, in, STDIN_FILENO);
-  launchpad_transfer_fd(lp, out, STDOUT_FILENO);
+  if (in == out) {
+    launchpad_clone_fd(lp, in, STDIN_FILENO);
+  } else {
+    launchpad_transfer_fd(lp, in, STDIN_FILENO);
+  }
+  if (out == err) {
+    launchpad_clone_fd(lp, out, STDOUT_FILENO);
+  } else {
+    launchpad_transfer_fd(lp, out, STDOUT_FILENO);
+  }
   launchpad_transfer_fd(lp, err, STDERR_FILENO);
 
   mx_handle_t proc = 0;
