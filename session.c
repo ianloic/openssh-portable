@@ -344,8 +344,8 @@ do_exec_no_pty(Session *s, const char *command)
 	session_proctitle(s);
 
 #ifdef __Fuchsia__
-        pid = fuchsia_launch_child(command, pin[0], pout[1], perr[1]);
-        if (pid <= 0) {
+	pid = fuchsia_launch_child(command, pin[0], pout[1], perr[1], false);
+	if (pid <= 0) {
 #ifdef USE_PIPES
 		close(pin[0]);
 		close(pin[1]);
@@ -360,7 +360,7 @@ do_exec_no_pty(Session *s, const char *command)
 		close(err[1]);
 #endif
 		return -1;
-        }
+	}
 #else
 	/* Fork the child. */
 	switch ((pid = fork())) {
@@ -530,7 +530,7 @@ do_exec_pty(Session *s, const char *command)
 	}
 
 #ifdef __Fuchsia__
-        pid = fuchsia_launch_child(command, ttyfd, ttyfd, ttyfd);
+	pid = fuchsia_launch_child(command, ttyfd, ttyfd, ttyfd, true);
 
 #else
 	/* Fork the child. */
@@ -596,8 +596,10 @@ do_exec_pty(Session *s, const char *command)
 
 	s->pid = pid;
 
+#ifndef __Fuchsia__
 	/* Parent.  Close the slave side of the pseudo tty. */
 	close(ttyfd);
+#endif  // __Fuchsia__
 
 	/* Enter interactive session. */
 	s->ptymaster = ptymaster;
