@@ -993,12 +993,7 @@ server_accept_inetd(int *sock_in, int *sock_out)
 		}
 	} else {
 		*sock_in = dup(STDIN_FILENO);
-#ifdef __Fuchsia__
-                // Currently in Fuchsia the socket only comes on stdin.
-		*sock_out = dup(STDIN_FILENO);
-#else
 		*sock_out = dup(STDOUT_FILENO);
-#endif // __Fuchsia__
 	}
 	/*
 	 * We intentionally do not close the descriptors 0, 1, and 2
