@@ -2,8 +2,33 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("developer-keys") {
+import("//packages/package.gni")
+
+package("developer-keys") {
   deps = [
+    ":all",
+  ]
+
+  resources = [
+    {
+      path = rebase_path("$root_out_dir/ssh-keys/authorized_keys")
+      dest = "ssh/authorized_keys"
+    },
+
+    {
+      path = rebase_path("$root_out_dir/ssh-keys/ssh_host_ed25519_key")
+      dest = "ssh/ssh_host_ed25519_key"
+    },
+
+    {
+      path = rebase_path("$root_out_dir/ssh-keys/ssh_host_ed25519_key.pub")
+      dest = "ssh/ssh_host_ed25519_key.pub"
+    },
+  ]
+}
+
+group("all") {
+  public_deps = [
     ":authorized_keys",
     ":host_key",
     ":id_key",
@@ -22,7 +47,7 @@ action("host_key") {
   ]
   outputs = [
     key_file,
-    key_file + ".pub"
+    key_file + ".pub",
   ]
 }
 
@@ -35,7 +60,7 @@ action("id_key") {
   ]
   outputs = [
     key_file,
-    key_file + ".pub"
+    key_file + ".pub",
   ]
 }
 

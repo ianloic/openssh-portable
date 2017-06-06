@@ -2,9 +2,39 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("openssh-portable") {
+import("//packages/package.gni")
+
+package("openssh-portable") {
   deps = [
-    ":config-files",
+    ":all",
+  ]
+
+  binaries = [
+    {
+      name = "scp"
+    },
+
+    {
+      name = "sftp-server"
+    },
+
+    {
+      name = "sshd"
+    },
+
+    {
+      name = "ssh-keygen"
+    },
+  ]
+
+  resources = [ {
+        path = rebase_path("fuchsia/sshd_config")
+        dest = "ssh/sshd_config"
+      } ]
+}
+
+group("all") {
+  public_deps = [
     ":scp",
     ":sftp-server",
     ":ssh",
@@ -30,15 +60,6 @@ config("fuchsia") {
   configs = [
     "//third_party/boringssl:boringssl_config",
     "//third_party/zlib:zlib_config",
-  ]
-}
-
-copy("config-files") {
-  sources = [
-    "fuchsia/sshd_config",
-  ]
-  outputs = [
-    "$root_out_dir/{{source_file_part}}",
   ]
 }
 
