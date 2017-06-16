@@ -7,6 +7,7 @@
 #include <mxio/io.h>
 #include <pthread.h>
 #include <pwd.h>
+#include <assert.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
