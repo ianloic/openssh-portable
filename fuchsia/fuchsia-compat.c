@@ -296,7 +296,7 @@ pid_t fuchsia_launch_child(const char* command, int in, int out, int err, bool t
   launchpad_create(0, command, &lp);
   launchpad_load_from_file(lp, argv[0]);
   launchpad_set_args(lp, argc, argv);
-  launchpad_clone(lp, LP_CLONE_MXIO_ROOT | LP_CLONE_MXIO_CWD);
+  launchpad_clone(lp, LP_CLONE_MXIO_NAMESPACE | LP_CLONE_MXIO_CWD);
   // TODO: set up environment
   if (in == out) {
     launchpad_clone_fd(lp, in, STDIN_FILENO);
