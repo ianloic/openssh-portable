@@ -83,7 +83,7 @@ static void* wait_thread_func(void* voidp) {
   Child* child = voidp;
 
   mx_signals_t observed;
-  mx_object_wait_one(child->handle, MX_PROCESS_SIGNALED, MX_TIME_INFINITE, &observed);
+  mx_object_wait_one(child->handle, MX_PROCESS_TERMINATED, MX_TIME_INFINITE, &observed);
 
   mx_info_process_t info;
   size_t actual;
