@@ -9,4 +9,7 @@ Host *
   UserKnownHostsFile /dev/null
   User fuchsia
   IdentityFile $1
+  ControlPersist yes
+  ControlMaster auto
+  ControlPath $(dirname $2)/%r@%h:%p
 EOF
