@@ -11,5 +11,5 @@ Host *
   IdentityFile $1
   ControlPersist yes
   ControlMaster auto
-  ControlPath $(dirname $2)/%r@%h:%p
+  ControlPath /tmp/fuchsia-$USER-%r@%h:%p
 EOF
