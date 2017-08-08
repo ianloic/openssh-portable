@@ -8,8 +8,11 @@ Host *
   GSSAPIDelegateCredentials no
   UserKnownHostsFile /dev/null
   User fuchsia
+  IdentitiesOnly yes
   IdentityFile $1
   ControlPersist yes
   ControlMaster auto
   ControlPath /tmp/fuchsia-$USER-%r@%h:%p
+  ServerAliveInterval 1
+  ServerAliveCountMax 1
 EOF
