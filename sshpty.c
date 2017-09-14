@@ -54,7 +54,7 @@
 #endif
 
 #ifdef __Fuchsia__
-#include <magenta/device/pty.h>
+#include <zircon/device/pty.h>
 #endif  // __Fuchsia__
 
 /*

@@ -11,7 +11,7 @@ your default Fuchsia device is:
 
 ```
 ssh -F $FUCHSIA_BUILD_DIR/ssh-keys/ssh_config \
-  $($FUCHSIA_OUT_DIR/build-magenta/tools/netaddr --fuchsia)
+  $($FUCHSIA_OUT_DIR/build-zircon/tools/netaddr --fuchsia)
 ```
 
 Similarly you can `scp` or `sftp` using the same config file. Note that
@@ -19,11 +19,11 @@ scp and sftp require the ipv6 address to be in square brackets, unlike ssh.
 
 ```
 sftp -F $FUCHSIA_BUILD_DIR/ssh-keys/ssh_config \
-  [$($FUCHSIA_OUT_DIR/build-magenta/tools/netaddr --fuchsia)]
+  [$($FUCHSIA_OUT_DIR/build-zircon/tools/netaddr --fuchsia)]
 
 scp -F $FUCHSIA_BUILD_DIR/ssh-keys/ssh_config \
   /local/path/file.txt \
-  [$($FUCHSIA_OUT_DIR/build-magenta/tools/netaddr --fuchsia)]:/remote/path
+  [$($FUCHSIA_OUT_DIR/build-zircon/tools/netaddr --fuchsia)]:/remote/path
 ```
 
 *NOTE 1*: Transfers of large files will stall and eventually fail. The cause is

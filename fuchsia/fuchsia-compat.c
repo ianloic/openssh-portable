@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 #include <launchpad/launchpad.h>
-#include <magenta/syscalls.h>
-#include <mxio/io.h>
+#include <zircon/syscalls.h>
+#include <fdio/io.h>
 #include <pthread.h>
 #include <pwd.h>
 #include <assert.h>
@@ -31,7 +31,7 @@ struct passwd* getpwent(void) {
   static struct passwd static_passwd = {
       .pw_name = "fuchsia",
       .pw_passwd = "",
-      .pw_uid = 23,  // matches MX_UID
+      .pw_uid = 23,  // matches ZX_UID
       .pw_gid = 23,
       .pw_gecos = "Fuchsia",
       .pw_dir = "/",
@@ -53,7 +53,7 @@ struct passwd* getpwuid(uid_t uid) {
 
 typedef struct {
   enum { UNUSED, RUNNING, STOPPED } state;
-  mx_handle_t handle;
+  zx_handle_t handle;
   int exit_code;
 } Child;
 
@@ -82,12 +82,12 @@ static volatile mysig_t sigchld_handler = SIG_IGN;
 static void* wait_thread_func(void* voidp) {
   Child* child = voidp;
 
-  mx_signals_t observed;
-  mx_object_wait_one(child->handle, MX_PROCESS_TERMINATED, MX_TIME_INFINITE, &observed);
+  zx_signals_t observed;
+  zx_object_wait_one(child->handle, ZX_PROCESS_TERMINATED, ZX_TIME_INFINITE, &observed);
 
-  mx_info_process_t info;
+  zx_info_process_t info;
   size_t actual;
-  mx_object_get_info(child->handle, MX_INFO_PROCESS, &info, sizeof(info), &actual, NULL);
+  zx_object_get_info(child->handle, ZX_INFO_PROCESS, &info, sizeof(info), &actual, NULL);
 
   child->state = STOPPED;
   child->exit_code = info.return_code;
@@ -107,7 +107,7 @@ static bool blocking_write(int fd, const char* buffer, size_t length) {
   uint32_t events;
   size_t offset = 0;
   while (offset < length) {
-    if (mxio_wait_fd(fd, MXIO_EVT_WRITABLE, &events, MX_TIME_INFINITE) < 0) {
+    if (fdio_wait_fd(fd, FDIO_EVT_WRITABLE, &events, ZX_TIME_INFINITE) < 0) {
       // Wait failed.
       return false;
     }
@@ -129,7 +129,7 @@ static void* process_input_thread_func(void* voidp) {
 
   for (;;) {
     uint32_t events;
-    if (mxio_wait_fd(fds[0], MXIO_EVT_READABLE, &events, MX_TIME_INFINITE) < 0) {
+    if (fdio_wait_fd(fds[0], FDIO_EVT_READABLE, &events, ZX_TIME_INFINITE) < 0) {
       // Wait failed.
       break;
     }
@@ -190,7 +190,7 @@ static void* process_output_thread_func(void* voidp) {
 
   for (;;) {
     uint32_t events;
-    if (mxio_wait_fd(fds[0], MXIO_EVT_READABLE, &events, MX_TIME_INFINITE) < 0) {
+    if (fdio_wait_fd(fds[0], FDIO_EVT_READABLE, &events, ZX_TIME_INFINITE) < 0) {
       // Wait failed.
       break;
     }
@@ -296,7 +296,7 @@ pid_t fuchsia_launch_child(const char* command, int in, int out, int err, bool t
   launchpad_create(0, command, &lp);
   launchpad_load_from_file(lp, argv[0]);
   launchpad_set_args(lp, argc, argv);
-  launchpad_clone(lp, LP_CLONE_MXIO_NAMESPACE | LP_CLONE_MXIO_CWD);
+  launchpad_clone(lp, LP_CLONE_FDIO_NAMESPACE | LP_CLONE_FDIO_CWD);
   // TODO: set up environment
   if (in == out) {
     launchpad_clone_fd(lp, in, STDIN_FILENO);
@@ -310,10 +310,10 @@ pid_t fuchsia_launch_child(const char* command, int in, int out, int err, bool t
   }
   launchpad_transfer_fd(lp, err, STDERR_FILENO);
 
-  mx_handle_t proc = 0;
+  zx_handle_t proc = 0;
   const char* errmsg;
 
-  mx_status_t status = launchpad_go(lp, &proc, &errmsg);
+  zx_status_t status = launchpad_go(lp, &proc, &errmsg);
   if (status < 0) {
     fprintf(stderr, "error from launchpad_go: %s\n", errmsg);
     fprintf(stderr, " status=%d\n", launchpad_get_status(lp));
