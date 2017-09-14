@@ -4,6 +4,13 @@
 
 import("//packages/package.gni")
 
+declare_args() {
+  # Additional SSH authorized_keys file to include in the build.
+  # For example:
+  #   extra_authorized_keys_file=\"$HOME/.ssh/id_rsa.pub\"
+  extra_authorized_keys_file = ""
+}
+
 package("developer-keys") {
   deps = [
     ":all",
@@ -64,16 +71,22 @@ action("id_key") {
   ]
 }
 
-copy("authorized_keys") {
-  sources = [
+action("authorized_keys") {
+  inputs = [
     "${keys_dir}/id_ed25519.pub",
   ]
+  if (extra_authorized_keys != "") {
+    inputs += [ extra_authorized_keys ]
+  }
   outputs = [
     "${keys_dir}/authorized_keys",
   ]
   deps = [
     ":id_key",
   ]
+
+  script = "concat_authorized_keys.sh"
+  args = rebase_path(outputs + inputs)
 }
 
 action("ssh_config") {
