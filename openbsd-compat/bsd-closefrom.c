@@ -100,7 +100,7 @@ closefrom(int lowfd)
 #ifdef HAVE_SYSCONF
 	maxfd = sysconf(_SC_OPEN_MAX);
 #elif __Fuchsia__
-        maxfd = MAX_FDIO_FD;
+        maxfd = FDIO_MAX_FD;
 #else
 	maxfd = getdtablesize();
 #endif /* HAVE_SYSCONF */
