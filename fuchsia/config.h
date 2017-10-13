@@ -104,28 +104,28 @@
 /* #undef DISABLE_FD_PASSING */
 
 /* Define if you don't want to use lastlog */
-/* #undef DISABLE_LASTLOG */
+#define DISABLE_LASTLOG 1
 
 /* Define if you don't want to use your system's login() call */
-/* #undef DISABLE_LOGIN */
+#define DISABLE_LOGIN 1
 
 /* Define if you don't want to use pututline() etc. to write [uw]tmp */
-/* #undef DISABLE_PUTUTLINE */
+#define DISABLE_PUTUTLINE 1
 
 /* Define if you don't want to use pututxline() etc. to write [uw]tmpx */
-/* #undef DISABLE_PUTUTXLINE */
+#define DISABLE_PUTUTXLINE 1
 
 /* Define if you want to disable shadow passwords */
 /* #undef DISABLE_SHADOW */
 
 /* Define if you don't want to use utmp */
-/* #undef DISABLE_UTMP */
+#define DISABLE_UTMP 1
 
 /* Define if you don't want to use utmpx */
-/* #undef DISABLE_UTMPX */
+#define DISABLE_UTMPX 1
 
 /* Define if you don't want to use wtmp */
-/* #undef DISABLE_WTMP */
+#define DISABLE_WTMP 1
 
 /* Define if you don't want to use wtmpx */
 #define DISABLE_WTMPX 1
@@ -681,7 +681,7 @@
 #define HAVE_LANGINFO_H 1
 
 /* Define to 1 if you have the <lastlog.h> header file. */
-#define HAVE_LASTLOG_H 1
+/* #undef HAVE_LASTLOG_H */
 
 /* Define if you want ldns support */
 /* #undef HAVE_LDNS */
@@ -741,7 +741,7 @@
 #define HAVE_LOCALE_H 1
 
 /* Define to 1 if you have the `login' function. */
-/* #define HAVE_LOGIN 1 */
+/* #undef HAVE_LOGIN */
 
 /* Define to 1 if you have the <login_cap.h> header file. */
 /* #undef HAVE_LOGIN_CAP_H */
@@ -1336,16 +1336,16 @@
 #define HAVE_UTIME_H 1
 
 /* Define to 1 if you have the `utmpname' function. */
-#define HAVE_UTMPNAME 1
+/* #undef HAVE_UTMPNAME */
 
 /* Define to 1 if you have the `utmpxname' function. */
-#define HAVE_UTMPXNAME 1
+/* #undef HAVE_UTMPXNAME */
 
 /* Define to 1 if you have the <utmpx.h> header file. */
-#define HAVE_UTMPX_H 1
+/* #undef HAVE_UTMPX_H */
 
 /* Define to 1 if you have the <utmp.h> header file. */
-#define HAVE_UTMP_H 1
+/* #undef HAVE_UTMP_H */
 
 /* define if you have u_char data type */
 #define HAVE_U_CHAR 1
@@ -1663,7 +1663,7 @@
 /* #undef USE_BSM_AUDIT */
 
 /* Use btmp to log bad logins */
-#define USE_BTMP 1
+/* #undef USE_BTMP */
 
 /* Use libedit for sftp */
 /* #undef USE_LIBEDIT */
