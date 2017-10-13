@@ -1507,7 +1507,10 @@ control_persist_detach(void)
 		if (devnull > STDERR_FILENO)
 			close(devnull);
 	}
-	daemon(1, 1);
+	// TODO(kulakowski) Fuchsia doesn't have fork(), and hence no
+	// daemon(3). Consider what semantics this actually needs and
+	// supply that, instead of calling daemon(1, 1) like this used
+	// to right here.
 	setproctitle("%s [mux]", options.control_path);
 }
 
@@ -1519,8 +1522,11 @@ fork_postauth(void)
 		control_persist_detach();
 	debug("forking to background");
 	fork_after_authentication_flag = 0;
-	if (daemon(1, 1) < 0)
-		fatal("daemon() failed: %.200s", strerror(errno));
+	// TODO(kulakowski) Fuchsia doesn't have fork(), and hence no
+	// daemon(3). Consider what semantics this actually needs and
+	// supply that.
+	errno = ENOSYS;
+	fatal("daemon() failed: %.200s", strerror(errno));
 }
 
 /* Callback for remote forward global requests */

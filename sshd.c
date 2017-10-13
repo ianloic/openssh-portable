@@ -1824,8 +1824,11 @@ main(int ac, char **av)
 	already_daemon = daemonized();
 	if (!(debug_flag || inetd_flag || no_daemon_flag || already_daemon)) {
 
-		if (daemon(0, 0) < 0)
-			fatal("daemon() failed: %.200s", strerror(errno));
+		// TODO(kulakowski) Fuchsia doesn't have fork(), and
+		// hence no daemon(3). Consider what semantics this
+		// actually needs and supply that.
+		errno = ENOSYS;
+		fatal("daemon() failed: %.200s", strerror(errno));
 
 		disconnect_controlling_tty();
 	}
