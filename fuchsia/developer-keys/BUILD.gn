@@ -75,8 +75,8 @@ action("authorized_keys") {
   inputs = [
     "${keys_dir}/id_ed25519.pub",
   ]
-  if (extra_authorized_keys != "") {
-    inputs += [ extra_authorized_keys ]
+  if (extra_authorized_keys_file != "") {
+    inputs += [ extra_authorized_keys_file ]
   }
   outputs = [
     "${keys_dir}/authorized_keys",
