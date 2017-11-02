@@ -12,6 +12,8 @@ declare_args() {
 }
 
 package("developer-keys") {
+  system_image = true
+
   deps = [
     ":all",
   ]

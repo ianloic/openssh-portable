@@ -5,6 +5,8 @@
 import("//packages/package.gni")
 
 package("openssh-portable") {
+  system_image = true
+
   deps = [
     ":all",
   ]
