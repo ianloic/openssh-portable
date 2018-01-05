@@ -365,7 +365,8 @@ pid_t waitpid(pid_t pid, int* status, int options) {
   }
 
   if (status) {
-    *status = child->exit_code;
+    // Make a status that can be parsed by WIFEXITED/WEXITSTATUS/etc.
+    *status = (0xFF & child->exit_code) << 8;
   }
   child->state = UNUSED;
 
