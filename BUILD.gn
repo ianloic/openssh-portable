@@ -70,6 +70,10 @@ source_set("fuchsia-compat") {
     "fuchsia/fuchsia-compat.c",
     "fuchsia/fuchsia-compat.h",
   ]
+  public_deps = [
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/launchpad",
+  ]
   configs += [ ":fuchsia" ]
 }
 
@@ -261,7 +265,6 @@ static_library("libssh") {
     ":umac128",
     "//third_party/boringssl",
   ]
-  libs = [ "launchpad" ]
   configs += [ ":fuchsia" ]
 }
 
@@ -357,6 +360,10 @@ source_set("openbsd-compat") {
   configs += [
     ":fuchsia",
     ":openbsd-compat-config",
+  ]
+  public_deps = [
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/launchpad",
   ]
 }
 
