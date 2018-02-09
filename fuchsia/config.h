@@ -543,7 +543,7 @@
 /* #undef HAVE_GETPWANAM */
 
 /* Define to 1 if you have the `getrlimit' function. */
-#define HAVE_GETRLIMIT 1
+/* #undef HAVE_GETRLIMIT */
 
 /* Define if getrrsetbyname() exists */
 /* #undef HAVE_GETRRSETBYNAME */
@@ -907,7 +907,7 @@
 #define HAVE_RECVMSG 1
 
 /* sys/resource.h has RLIMIT_NPROC */
-#define HAVE_RLIMIT_NPROC /**/
+/* #undef HAVE_RLIMIT_NPROC */
 
 /* Define to 1 if you have the <rpc/types.h> header file. */
 #undef HAVE_RPC_TYPES_H
@@ -1000,7 +1000,7 @@
 #define HAVE_SETREUID 1
 
 /* Define to 1 if you have the `setrlimit' function. */
-#define HAVE_SETRLIMIT 1
+/* #undef HAVE_SETRLIMIT */
 
 /* Define to 1 if you have the `setsid' function. */
 #define HAVE_SETSID 1
