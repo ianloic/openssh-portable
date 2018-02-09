@@ -46,7 +46,9 @@
 #ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
 #endif
+#ifdef HAVE_SETRLIMIT
 #include <sys/resource.h>
+#endif
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
