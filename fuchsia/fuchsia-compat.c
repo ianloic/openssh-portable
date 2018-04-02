@@ -99,6 +99,9 @@ static void* wait_thread_func(void* voidp) {
     handler(SIGCHLD);
   }
 
+  zx_handle_close(child->handle);
+  child->handle = ZX_HANDLE_INVALID;
+
   return NULL;
 }
 
