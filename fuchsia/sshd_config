@@ -93,6 +93,8 @@ PasswordAuthentication no
 #PrintMotd yes
 #PrintLastLog yes
 TCPKeepAlive no
+ClientAliveInterval 1
+ClientAliveCountMax 5
 #UseLogin no
 UsePrivilegeSeparation no
 #PermitUserEnvironment no
