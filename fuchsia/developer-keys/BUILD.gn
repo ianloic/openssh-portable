@@ -12,7 +12,7 @@ declare_args() {
 }
 
 package("developer-keys") {
-  system_image = true
+  deprecated_system_image = true
 
   deps = [
     ":all",
