@@ -362,7 +362,11 @@ timeout_connect(int sockfd, const struct sockaddr *serv_addr,
 	ms_to_timeval(&tv, *timeoutp);
 
 	for (;;) {
+#ifdef __Fuchsia__
+		rc = fuchsia_select(sockfd + 1, NULL, fdset, &tv);
+#else
 		rc = select(sockfd + 1, NULL, fdset, NULL, &tv);
+#endif
 		if (rc != -1 || errno != EINTR)
 			break;
 	}

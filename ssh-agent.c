@@ -1442,7 +1442,11 @@ skip:
 
 	while (1) {
 		prepare_select(&readsetp, &writesetp, &max_fd, &nalloc, &tvp);
+#ifdef __Fuchsia__
+		result = fuchsia_select(max_fd + 1, readsetp, writesetp, tvp);
+#else
 		result = select(max_fd + 1, readsetp, writesetp, NULL, tvp);
+#endif
 		saved_errno = errno;
 		if (parent_alive_interval != 0)
 			check_parent_exists();

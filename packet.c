@@ -1452,9 +1452,16 @@ ssh_packet_read_seqnr(struct ssh *ssh, u_char *typep, u_int32_t *seqnr_p)
 				ms_to_timeval(&timeout, ms_remain);
 				gettimeofday(&start, NULL);
 			}
+#ifdef __Fuchsia__
+            /* TODO: Just do a wait for readable on the state->connection_in fd */
+			if ((r = fuchsia_select(state->connection_in + 1, setp,
+			    NULL, timeoutp)) >= 0)
+				break;
+#else
 			if ((r = select(state->connection_in + 1, setp,
 			    NULL, NULL, timeoutp)) >= 0)
 				break;
+#endif
 			if (errno != EAGAIN && errno != EINTR &&
 			    errno != EWOULDBLOCK)
 				break;
@@ -2252,9 +2259,17 @@ ssh_packet_write_wait(struct ssh *ssh)
 				ms_to_timeval(&timeout, ms_remain);
 				gettimeofday(&start, NULL);
 			}
+#ifdef __Fuchsia__
+            /* TODO: Just do a wait for writable on the state->connection_out fd */
+			if ((ret = fuchsia_select(state->connection_out + 1,
+                NULL, setp, timeoutp)) >= 0)
+				break;
+#else
+
 			if ((ret = select(state->connection_out + 1,
 			    NULL, setp, NULL, timeoutp)) >= 0)
 				break;
+#endif
 			if (errno != EAGAIN && errno != EINTR &&
 			    errno != EWOULDBLOCK)
 				break;

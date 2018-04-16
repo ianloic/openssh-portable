@@ -1132,7 +1132,11 @@ server_accept_loop(int *sock_in, int *sock_out, int *newsock, int *config_s)
 				FD_SET(startup_pipes[i], fdset);
 
 		/* Wait in select until there is a connection. */
+#ifdef __Fuchsia__
+		ret = fuchsia_select(maxfd+1, fdset, NULL, NULL);
+#else
 		ret = select(maxfd+1, fdset, NULL, NULL, NULL);
+#endif
 		if (ret < 0 && errno != EINTR)
 			error("select: %.100s", strerror(errno));
 		if (received_sigterm) {

@@ -261,7 +261,11 @@ wait_until_can_do_something(int connection_in, int connection_out,
 	}
 
 	/* Wait for something to happen, or the timeout to expire. */
+#ifdef __Fuchsia__
+    ret = fuchsia_select((*maxfdp)+1, *readsetp, *writesetp, tvp);
+#else
 	ret = select((*maxfdp)+1, *readsetp, *writesetp, NULL, tvp);
+#endif
 
 	if (ret == -1) {
 		memset(*readsetp, 0, *nallocp);

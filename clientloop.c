@@ -688,7 +688,11 @@ client_wait_until_can_do_something(fd_set **readsetp, fd_set **writesetp,
 		tvp = &tv;
 	}
 
+#ifdef __Fuchsia__
+	ret = fuchsia_select((*maxfdp)+1, *readsetp, *writesetp, tvp);
+#else
 	ret = select((*maxfdp)+1, *readsetp, *writesetp, NULL, tvp);
+#endif
 	if (ret < 0) {
 		char buf[100];
 

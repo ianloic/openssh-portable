@@ -322,7 +322,11 @@ main(int argc, char **argv)
 		if (olen > 0)
 			FD_SET(out, wset);
 
+#ifdef __Fuchsia___
+		if (fuchsia_select(max+1, rset, wset, NULL) < 0) {
+#else
 		if (select(max+1, rset, wset, NULL, NULL) < 0) {
+#endif
 			if (errno == EINTR)
 				continue;
 			error("select: %s", strerror(errno));
