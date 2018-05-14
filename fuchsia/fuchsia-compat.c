@@ -118,11 +118,11 @@ static bool blocking_write(int fd, const char* buffer, size_t length) {
 			return false;
 		}
 		ssize_t length_written = write(fd, buffer + offset, length - offset);
+		if (length_written == -1 && errno == EAGAIN) {
+			// Wait and read again.
+			continue;
+		}
 		if (length_written <= 0) {
-                        if (errno == EAGAIN) {
-                          // Wait and read again.
-                          continue;
-                        }
 			// EOF or error.
 			return false;
 		}
