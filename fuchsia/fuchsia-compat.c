@@ -401,7 +401,8 @@ int fuchsia_select(int nfds, void* readfds, void* writefds, struct timeval *time
 
 	if (st != ZX_OK) {
 		fprintf(stderr, "Can't allocate new port.\n");
-		ret = EINVAL;
+		errno = EINVAL;
+		ret = -1;
 		goto cleanup;
 	}
 
@@ -421,7 +422,8 @@ int fuchsia_select(int nfds, void* readfds, void* writefds, struct timeval *time
 		fdio_t* io;
 		// This acquires a reference to the fdio which is released in the cleanup path below.
 		if ((io = __fdio_fd_to_io(fd)) == NULL) {
-			ret = EBADF;
+			errno = EBADF;
+			ret = -1;
 			goto cleanup;
 		}
 		ios[fd] = io;
@@ -430,14 +432,16 @@ int fuchsia_select(int nfds, void* readfds, void* writefds, struct timeval *time
 		// Translate the poll-style events to fdio-specific signal bits to wait on.
 		__fdio_wait_begin(io, events, &h, &sigs);
 		if (h == ZX_HANDLE_INVALID) {
-			ret = EBADF;
+			errno = EBADF;
+			ret = -1;
 			goto cleanup;
 		}
 		uint64_t key = fd;
 		st = zx_object_wait_async(h, port, key, sigs, ZX_WAIT_ASYNC_ONCE);
 		if (st != ZX_OK) {
 			fprintf(stderr, "Can't wait on object %d.\n", st);
-			ret = EINVAL;
+			errno = EINVAL;
+			ret = -1;
 			goto cleanup;
 		}
 	}
@@ -454,7 +458,8 @@ int fuchsia_select(int nfds, void* readfds, void* writefds, struct timeval *time
 		if (st == ZX_OK) {
 			if (packet.type != ZX_PKT_TYPE_SIGNAL_ONE) {
 				fprintf(stderr, "Unexpected port packet type %u\n", packet.type);
-				ret = EINVAL;
+				errno = EINVAL;
+				ret = -1;
 				goto cleanup;
 			}
 			// We've heard about an fd in the set we care about. Update the read/write
@@ -465,7 +470,8 @@ int fuchsia_select(int nfds, void* readfds, void* writefds, struct timeval *time
 			fdio_t* io = ios[fd];
 			if (!io) {
 				fprintf(stderr, "Can't find fd for packet key %d.\n", fd);
-				ret = EINVAL;
+				errno = EINVAL;
+				ret = -1;
 				goto cleanup;
 			}
 			// __fdio_wait_end translates the signals back to poll-style flags.
@@ -490,7 +496,8 @@ int fuchsia_select(int nfds, void* readfds, void* writefds, struct timeval *time
 			break;
 		} else {
 			fprintf(stderr, "Port wait return unexpected error %d.\n", st);
-			ret = EINVAL;
+			errno = EINVAL;
+			ret = -1;
 			goto cleanup;
 		}
 
