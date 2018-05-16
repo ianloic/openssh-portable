@@ -1,6 +1,8 @@
 Name: OpenSSH
 URL: https://www.openssh.com
-Upstream git: https://anongit.mindrot.org/openssh.git
+License: MIT
+License File: LICENCE
+Upstream Git: https://anongit.mindrot.org/openssh.git
 Description:
 
 OpenSSH is an implementation of the SSH protocol suite, including a client,
