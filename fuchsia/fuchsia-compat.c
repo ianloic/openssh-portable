@@ -451,7 +451,7 @@ int fuchsia_select(int nfds, void* readfds, void* writefds, struct timeval *time
 
 	for (;;) {
 		zx_port_packet_t packet;
-		st = zx_port_wait(port, deadline, &packet, 1);
+		st = zx_port_wait(port, deadline, &packet);
 
 		// We expect zx_port_wait to return either ZX_ERR_TIMED_OUT if nothing happened, or ZX_OK
 		// if at least one thing happened.
