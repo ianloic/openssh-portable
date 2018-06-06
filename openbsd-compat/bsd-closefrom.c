@@ -48,7 +48,7 @@
 #endif
 
 #ifdef __Fuchsia__
-#include <fdio/limits.h>
+#include <lib/fdio/limits.h>
 #endif
 
 #ifndef OPEN_MAX

@@ -12,8 +12,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <fdio/io.h>
-#include <fdio/private.h>
+#include <lib/fdio/io.h>
+#include <lib/fdio/private.h>
 #include <launchpad/launchpad.h>
 #include <zircon/syscalls.h>
 #include <zircon/syscalls/port.h>
