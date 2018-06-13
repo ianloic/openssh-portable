@@ -14,7 +14,8 @@
 
 #include <lib/fdio/io.h>
 #include <lib/fdio/private.h>
-#include <launchpad/launchpad.h>
+#include <lib/fdio/spawn.h>
+#include <zircon/status.h>
 #include <zircon/syscalls.h>
 #include <zircon/syscalls/port.h>
 
@@ -302,31 +303,32 @@ pid_t fuchsia_launch_child(const char* command, int in, int out, int err, bool t
 		}
 	}
 
-	launchpad_t* lp;
-	launchpad_create(0, command, &lp);
-	launchpad_load_from_file(lp, argv[0]);
-	launchpad_set_args(lp, argc, argv);
-	launchpad_clone(lp, LP_CLONE_FDIO_NAMESPACE);
+	fdio_spawn_action_t actions[3] = {
+		{
+			.action = (in == out) ? FDIO_SPAWN_ACTION_CLONE_FD : FDIO_SPAWN_ACTION_TRANSFER_FD,
+			.fd = {.local_fd = in, .target_fd = STDIN_FILENO},
+		},
+		{
+			.action = (out == err) ? FDIO_SPAWN_ACTION_CLONE_FD : FDIO_SPAWN_ACTION_TRANSFER_FD,
+			.fd = {.local_fd = out, .target_fd = STDOUT_FILENO},
+		},
+		{
+			.action = FDIO_SPAWN_ACTION_TRANSFER_FD,
+			.fd = {.local_fd = err, .target_fd = STDERR_FILENO},
+		},
+	};
+
 	// TODO: set up environment
-	if (in == out) {
-		launchpad_clone_fd(lp, in, STDIN_FILENO);
-	} else {
-		launchpad_transfer_fd(lp, in, STDIN_FILENO);
-	}
-	if (out == err) {
-		launchpad_clone_fd(lp, out, STDOUT_FILENO);
-	} else {
-		launchpad_transfer_fd(lp, out, STDOUT_FILENO);
-	}
-	launchpad_transfer_fd(lp, err, STDERR_FILENO);
 
 	zx_handle_t proc = 0;
-	const char* errmsg;
+	char err_msg[FDIO_SPAWN_ERR_MSG_MAX_LENGTH];
 
-	zx_status_t status = launchpad_go(lp, &proc, &errmsg);
+	uint32_t flags = FDIO_SPAWN_CLONE_JOB | FDIO_SPAWN_CLONE_LDSVC | FDIO_SPAWN_CLONE_NAMESPACE;
+	zx_status_t status = fdio_spawn_etc(ZX_HANDLE_INVALID, flags, argv[0], argv, NULL, 3, actions, &proc, err_msg);
+
 	if (status < 0) {
-		fprintf(stderr, "error from launchpad_go: %s\n", errmsg);
-		fprintf(stderr, " status=%d\n", launchpad_get_status(lp));
+		fprintf(stderr, "error from fdio_spawn_etc: %s\n", err_msg);
+		fprintf(stderr, " status=%d (%s)\n", status, zx_status_get_string(status));
 		exit(1);
 	}
 
