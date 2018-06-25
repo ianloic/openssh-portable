@@ -1213,7 +1213,7 @@
 /* #undef HAVE_SYS_PTMS_H */
 
 /* Define to 1 if you have the <sys/ptrace.h> header file. */
-#define HAVE_SYS_PTRACE_H 1
+/* #undef HAVE_SYS_PTRACE_H */
 
 /* Define to 1 if you have the <sys/select.h> header file. */
 #define HAVE_SYS_SELECT_H 1
